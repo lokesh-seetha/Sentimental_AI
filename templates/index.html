@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Hotel Sentiment Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-lg-8 text-center mb-5">
+      <h1 class="display-4 fw-bold text-gradient mb-3">Hotel Sentiment Analyzer</h1>
+      <p class="lead text-muted">Unlock the power of AI to understand guest experiences. Submit a review and get instant
+        sentiment analysis.</p>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-lg border-0">
+        <div class="card-body p-5">
+          {% if current_user.is_authenticated %}
+          <h3 class="mb-4 text-center">Analyze a Review</h3>
+          <form action="/add_review" method="POST">
+            <div class="mb-4">
+              <label for="review" class="form-label fw-bold">Review Text</label>
+              <textarea class="form-control form-control-lg bg-light" id="review" name="review" rows="5"
+                placeholder="Paste the hotel review here..." required></textarea>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-12"><label class="form-label fw-bold text-muted small">Optional Ratings (1-5)</label>
+              </div>
+              <div class="col-md-2 col-4">
+                <input type="number" class="form-control" name="rating_overall" placeholder="Overall" min="1" max="5">
+              </div>
+              <div class="col-md-2 col-4">
+                <input type="number" class="form-control" name="rating_cleanliness" placeholder="Clean" min="1" max="5">
+              </div>
+              <div class="col-md-2 col-4">
+                <input type="number" class="form-control" name="rating_food" placeholder="Food" min="1" max="5">
+              </div>
+              <div class="col-md-2 col-4">
+                <input type="number" class="form-control" name="rating_staff" placeholder="Staff" min="1" max="5">
+              </div>
+              <div class="col-md-2 col-4">
+                <input type="number" class="form-control" name="rating_amenities" placeholder="Amenities" min="1"
+                  max="5">
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary btn-lg rounded-pill">
+                <i class="bi bi-lightning-charge me-2"></i>Analyze & Save
+              </button>
+            </div>
+          </form>
+          {% else %}
+          <div class="text-center py-4">
+            <div class="mb-4">
+              <i class="bi bi-lock-fill display-1 text-muted opacity-25"></i>
+            </div>
+            <h3>Login Required</h3>
+            <p class="text-muted mb-4">Please login to submit reviews and access your personalized dashboard.</p>
+            <div class="d-flex justify-content-center gap-3">
+              <a href="/login" class="btn btn-primary px-4 rounded-pill">Login</a>
+              <a href="/register" class="btn btn-outline-primary px-4 rounded-pill">Register</a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-5 g-4">
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+        <div class="text-primary mb-3"><i class="bi bi-cpu fs-1"></i></div>
+        <h5>AI Powered</h5>
+        <p class="text-muted small">Utilizes advanced machine learning models to accurately detect sentiment.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+        <div class="text-success mb-3"><i class="bi bi-bar-chart fs-1"></i></div>
+        <h5>Visual Analytics</h5>
+        <p class="text-muted small">Get detailed insights with interactive charts and statistical breakdowns.</p>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+        <div class="text-info mb-3"><i class="bi bi-shield-lock fs-1"></i></div>
+        <h5>Secure & Private</h5>
+        <p class="text-muted small">Your reviews are securely stored and accessible only to you.</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

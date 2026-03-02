@@ -1,0 +1,42 @@
+[
+    {
+        "Model": "Logistic Regression (Tuned)",
+        "Accuracy": 0.8163,
+        "Precision": 0.8525,
+        "Recall": 0.8163,
+        "F1 Score": 0.8308,
+        "Time (s)": 1.06
+    },
+    {
+        "Model": "SGD Classifier (SVM-like)",
+        "Accuracy": 0.8605,
+        "Precision": 0.8482,
+        "Recall": 0.8605,
+        "F1 Score": 0.8531,
+        "Time (s)": 0.26
+    },
+    {
+        "Model": "Naive Bayes",
+        "Accuracy": 0.7111,
+        "Precision": 0.8126,
+        "Recall": 0.7111,
+        "F1 Score": 0.7465,
+        "Time (s)": 2.19
+    },
+    {
+        "Model": "Decision Tree (Depth=20)",
+        "Accuracy": 0.7592,
+        "Precision": 0.7267,
+        "Recall": 0.7592,
+        "F1 Score": 0.7395,
+        "Time (s)": 7.26
+    },
+    {
+        "Model": "Voting Ensemble",
+        "Accuracy": 0.8414,
+        "Precision": 0.8526,
+        "Recall": 0.8414,
+        "F1 Score": 0.8464,
+        "Time (s)": 1.59
+    }
+]

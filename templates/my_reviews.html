@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}My Reviews{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-gradient">My Submitted Reviews</h1>
+        <a href="/" class="btn btn-primary rounded-pill px-4 shadow-sm">
+            <i class="bi bi-plus-lg me-2"></i>Add New Review
+        </a>
+    </div>
+
+    {% if reviews %}
+    <div class="row">
+        {% for review in reviews %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm border-0 hover-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span
+                            class="badge {% if review.sentiment == 'positive' %}bg-success{% elif review.sentiment == 'negative' %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill px-3 py-2">
+                            {{ review.sentiment|title }}
+                        </span>
+                        <small class="text-muted">ID: #{{ review.id }}</small>
+                    </div>
+                    <p class="card-text lead mb-4">"{{ review.text }}"</p>
+
+                    <div class="ratings-grid small text-muted">
+                        <div class="row g-2">
+                            <div class="col-6">Overall: <span class="fw-bold text-dark">{{ review.rating_overall or '-'
+                                    }}</span>/5</div>
+                            <div class="col-6">Cleanliness: <span class="fw-bold text-dark">{{ review.rating_cleanliness
+                                    or '-' }}</span>/5</div>
+                            <div class="col-6">Food: <span class="fw-bold text-dark">{{ review.rating_food or '-'
+                                    }}</span>/5</div>
+                            <div class="col-6">Staff: <span class="fw-bold text-dark">{{ review.rating_staff or '-'
+                                    }}</span>/5</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <div class="mb-4">
+            <i class="bi bi-journal-text display-1 text-muted opacity-25"></i>
+        </div>
+        <h3 class="text-muted">No reviews yet</h3>
+        <p class="lead mb-4">Share your experience with us!</p>
+        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 shadow-sm">Write a Review</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+Flask
+Flask_SQLAlchemy
+textblob
+pandas
+matplotlib
+gunicorn          # for deployment later (optional but good)
+scikit-learn
+joblib

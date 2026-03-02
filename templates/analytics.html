@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | Hotel Sentiment Analyzer{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-3">Sentiment & Ratings Analytics</h2>
+
+<div class="row gy-4">
+
+  <!-- Sentiment Distribution -->
+  <div class="col-lg-6">
+    <div class="card p-3 shadow-sm">
+      <h5>Overall Sentiment</h5>
+      <ul class="small text-muted">
+        <li>Positive: {{ sentiment_counts["positive"] }}</li>
+        <li>Negative: {{ sentiment_counts["negative"] }}</li>
+        <li>Neutral: {{ sentiment_counts["neutral"] }}</li>
+      </ul>
+      <canvas id="sentimentChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Average Ratings -->
+  <div class="col-lg-6">
+    <div class="card p-3 shadow-sm">
+      <h5>Average Star Ratings (1–5)</h5>
+      <ul class="small text-muted">
+        <li>Overall: {{ avg_ratings["overall"] }}</li>
+        <li>Cleanliness: {{ avg_ratings["cleanliness"] }}</li>
+        <li>Food: {{ avg_ratings["food"] }}</li>
+        <li>Staff Behaviour: {{ avg_ratings["staff"] }}</li>
+        <li>Amenities: {{ avg_ratings["amenities"] }}</li>
+      </ul>
+      <canvas id="ratingChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Complaint Categories -->
+  <div class="col-12">
+    <div class="card p-3 shadow-sm">
+      <h5>Top Complaint Categories (from low ratings)</h5>
+      <p class="small text-muted">
+        Counts of reviews where the rating is ≤ 2 stars:
+        Cleanliness: {{ complaint_counts["cleanliness"] }},
+        Food: {{ complaint_counts["food"] }},
+        Staff: {{ complaint_counts["staff"] }},
+        Amenities: {{ complaint_counts["amenities"] }}.
+      </p>
+      <canvas id="complaintChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const sentimentCounts = {{ sentiment_counts | tojson }};
+    const avgRatings = {{ avg_ratings | tojson }};
+    const complaintCounts = {{ complaint_counts | tojson }};
+
+    // Sentiment chart
+    const ctx1 = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Positive', 'Negative', 'Neutral'],
+            datasets: [{
+                label: 'Review Count',
+                data: [
+                    sentimentCounts.positive,
+                    sentimentCounts.negative,
+                    sentimentCounts.neutral
+                ]
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, precision: 0 }
+            }
+        }
+    });
+
+    // Average rating chart
+    const ctx2 = document.getElementById('ratingChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: ['Overall', 'Cleanliness', 'Food', 'Staff', 'Amenities'],
+            datasets: [{
+                label: 'Average Rating (1–5)',
+                data: [
+                    avgRatings.overall,
+                    avgRatings.cleanliness,
+                    avgRatings.food,
+                    avgRatings.staff,
+                    avgRatings.amenities
+                ]
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, max: 5 }
+            }
+        }
+    });
+
+    // Complaint chart (ratings <= 2)
+    const ctx3 = document.getElementById('complaintChart').getContext('2d');
+    new Chart(ctx3, {
+        type: 'bar',
+        data: {
+            labels: ['Cleanliness', 'Food', 'Staff', 'Amenities'],
+            datasets: [{
+                label: 'Number of Low Ratings (≤ 2★)',
+                data: [
+                    complaintCounts.cleanliness,
+                    complaintCounts.food,
+                    complaintCounts.staff,
+                    complaintCounts.amenities
+                ]
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, precision: 0 }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

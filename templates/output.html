@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset Analysis Output{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4 text-gradient fw-bold">Project Output & Analysis</h1>
+
+    <!-- 1. Imported Libraries -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-gradient-primary text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-code-square me-2"></i>Imported Python Libraries</h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+                {% for lib in libraries %}
+                <span class="badge bg-light text-dark border p-2">{{ lib }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Dataset Overview -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-success text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-table me-2"></i>Dataset Overview</h5>
+        </div>
+        <div class="card-body">
+            <div class="row text-center">
+                <div class="col-md-6 border-end">
+                    <h3 class="fw-bold text-success">{{ dataset_shape }}</h3>
+                    <p class="text-muted">Dataset Shape</p>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="fw-bold text-danger">{{ duplicates_count }}</h3>
+                    <p class="text-muted">Duplicate Rows</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. Dataset Head -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-info text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-eye me-2"></i>Dataset Preview (First 5 Rows)</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            {% for col in columns %}
+                            <th class="small text-uppercase">{{ col }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        {% for row in dataset_head %}
+                        <tr>
+                            {% for col in columns %}
+                            <td>{{ row[col] }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 4. Missing Values -->
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm border-0 h-100">
+                <div class="card-header bg-warning text-dark border-0">
+                    <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Missing Values</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column</th>
+                                <th class="text-end">Missing Count</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for col, count in missing_values.items() %}
+                            <tr>
+                                <td class="ps-3">{{ col }}</td>
+                                <td class="text-end pe-3 {% if count > 0 %}text-danger fw-bold{% endif %}">{{ count }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Data Types -->
+        <div class="col-md-6">
+            <div class="card mb-4 shadow-sm border-0 h-100">
+                <div class="card-header bg-secondary text-white border-0">
+                    <h5 class="mb-0"><i class="bi bi-file-earmark-code me-2"></i>Data Types</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column</th>
+                                <th class="text-end">Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for col, dtype in data_types.items() %}
+                            <tr>
+                                <td class="ps-3">{{ col }}</td>
+                                <td class="text-end pe-3 font-monospace small">{{ dtype }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Outliers -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-danger text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-bug me-2"></i>Outlier Detection (Rating Column)</h5>
+        </div>
+        <div class="card-body">
+            {% if outliers_info is mapping %}
+            <div class="row text-center mb-3">
+                <div class="col-md-3">
+                    <div class="p-2 bg-light rounded">
+                        <small class="text-muted d-block">Q1 (25%)</small>
+                        <strong>{{ outliers_info['Q1'] }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 bg-light rounded">
+                        <small class="text-muted d-block">Q3 (75%)</small>
+                        <strong>{{ outliers_info['Q3'] }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 bg-light rounded">
+                        <small class="text-muted d-block">IQR</small>
+                        <strong>{{ outliers_info['IQR'] }}</strong>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="p-2 bg-danger-subtle rounded text-danger">
+                        <small class="d-block">Outliers Count</small>
+                        <strong>{{ outliers_info['Count'] }}</strong>
+                    </div>
+                </div>
+            </div>
+            <p class="text-center small text-muted mb-0">
+                <i class="bi bi-info-circle me-1"></i>
+                Bounds: [{{ outliers_info['Lower Bound'] }}, {{ outliers_info['Upper Bound'] }}] (Method: IQR)
+            </p>
+            {% else %}
+            <p>{{ outliers_info }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 7. Descriptive Statistics & Enhanced Analytics -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-dark text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-calculator me-2"></i>Descriptive Statistics & Enhanced Analytics</h5>
+        </div>
+        <div class="card-body">
+            <!-- Numerical Stats -->
+            <h6 class="text-primary mb-3"><i class="bi bi-123 me-2"></i>Numerical Features (Mean, Std, Min, Max)</h6>
+            <div class="table-responsive mb-4">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Feature</th>
+                            <th>Mean</th>
+                            <th>Std Dev</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if analysis_stats.numerical_stats %}
+                        {% for feature, stats in analysis_stats.numerical_stats.items() %}
+                        <tr>
+                            <td>{{ feature }}</td>
+                            <td>{{ stats.mean }}</td>
+                            <td>{{ stats.std }}</td>
+                            <td>{{ stats.min }}</td>
+                            <td>{{ stats.max }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5">No numerical stats available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Feature Scaling -->
+            <h6 class="text-primary mb-3"><i class="bi bi-arrows-angle-contract me-2"></i>Feature Scaling
+                (StandardScaler Results)</h6>
+            <div class="alert alert-light border small mb-3">
+                <i class="bi bi-lightbulb me-2"></i>Demonstration of scaling numerical features (Mean ≈ 0, Std ≈ 1)
+            </div>
+            <div class="table-responsive mb-4">
+                <table class="table table-sm table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Feature</th>
+                            <th>Mean</th>
+                            <th>Std Dev</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if analysis_stats.scaled_stats %}
+                        {% for feature, stats in analysis_stats.scaled_stats.items() %}
+                        <tr>
+                            <td>{{ feature }}</td>
+                            <td>{{ stats.mean }}</td>
+                            <td>{{ stats.std }}</td>
+                            <td>{{ stats.min }}</td>
+                            <td>{{ stats.max }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5">No scaled stats available.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <hr>
+            <h6 class="text-secondary mb-3">Original Data Description</h6>
+            <div class="table-responsive">
+                {{ desc_stats | safe }}
+            </div>
+        </div>
+    </div>
+
+    <!-- 8. Visual Analysis -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-primary text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-images me-2"></i>Visual Analysis</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-header bg-light py-2 small fw-bold">Target Variable Distribution (Sentiment)
+                        </div>
+                        <div class="card-body text-center">
+                            {% if plots.target_dist %}
+                            <img src="{{ url_for('static', filename=plots.target_dist) }}" class="img-fluid rounded"
+                                alt="Target Distribution">
+                            {% else %}
+                            <p class="text-muted">Plot not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-header bg-light py-2 small fw-bold">Univariate Analysis (Rating Distribution)
+                        </div>
+                        <div class="card-body text-center">
+                            {% if plots.univariate %}
+                            <img src="{{ url_for('static', filename=plots.univariate) }}" class="img-fluid rounded"
+                                alt="Univariate Analysis">
+                            {% else %}
+                            <p class="text-muted">Plot not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-header bg-light py-2 small fw-bold">Bivariate Analysis (Rating vs Sentiment)
+                        </div>
+                        <div class="card-body text-center">
+                            {% if plots.bivariate %}
+                            <img src="{{ url_for('static', filename=plots.bivariate) }}" class="img-fluid rounded"
+                                alt="Bivariate Analysis">
+                            {% else %}
+                            <p class="text-muted">Plot not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-header bg-light py-2 small fw-bold">Correlation Heatmap</div>
+                        <div class="card-body text-center">
+                            {% if plots.correlation %}
+                            <img src="{{ url_for('static', filename=plots.correlation) }}" class="img-fluid rounded"
+                                alt="Correlation Heatmap">
+                            {% else %}
+                            <p class="text-muted">Plot not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-header bg-light py-2 small fw-bold">Pairplot Analysis</div>
+                        <div class="card-body text-center">
+                            {% if plots.pairplot %}
+                            <img src="{{ url_for('static', filename=plots.pairplot) }}" class="img-fluid rounded"
+                                alt="Pairplot">
+                            {% else %}
+                            <p class="text-muted">Plot not available.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Boxplots -->
+            <h6 class="mt-4 text-primary"><i class="bi bi-box-seam me-2"></i>Boxplots (Numerical Features)</h6>
+            <div class="row">
+                {% if boxplots %}
+                {% for plot in boxplots %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border shadow-sm">
+                        <div class="card-body p-2">
+                            <img src="{{ url_for('static', filename=plot) }}" class="img-fluid rounded" alt="Boxplot">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">No boxplots available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- 9. Model Building Results -->
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-header bg-success text-white border-0">
+            <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Model Building & Comparison</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded h-100">
+                        <small class="text-muted d-block">Task</small>
+                        <strong>Sentiment Classification</strong>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded h-100">
+                        <small class="text-muted d-block">Preprocessing</small>
+                        <strong>TF-IDF (N-grams 1-2)</strong>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="p-3 bg-light rounded h-100">
+                        <small class="text-muted d-block">Split</small>
+                        <strong>80% Train, 20% Test</strong>
+                    </div>
+                </div>
+            </div>
+
+            <h6 class="mt-4 mb-3">Model Comparison Table</h6>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Model</th>
+                            <th>Accuracy</th>
+                            <th>Precision (Weighted)</th>
+                            <th>Recall (Weighted)</th>
+                            <th>F1 Score (Weighted)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for res in model_results %}
+                        <tr>
+                            <td><strong>{{ res.Model }}</strong></td>
+                            <td>
+                                {% if res.Accuracy != 'Error' and res.Accuracy|float > 0.95 %}
+                                <span class="badge bg-success">{{ res.Accuracy }}</span>
+                                {% else %}
+                                {{ res.Accuracy }}
+                                {% endif %}
+                            </td>
+                            <td>{{ res.Precision }}</td>
+                            <td>{{ res.Recall }}</td>
+                            <td>{{ res['F1 Score'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
